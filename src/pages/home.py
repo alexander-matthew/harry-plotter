@@ -2,7 +2,7 @@
 Home page - Image processing workflow for the CNC Pen Plotter application.
 """
 import dash
-from dash import dcc, html, Input, Output, State, callback
+from dash import dcc, html, Input, Output, State, callback, MATCH
 import dash_bootstrap_components as dbc
 from dash.exceptions import PreventUpdate
 import base64
@@ -22,16 +22,28 @@ dash.register_page(__name__, path='/', title='Image Processing')
 # Page layout
 layout = dbc.Container([
     dbc.Row([
-        # Left Sidebar - Controls
+        # Left Sidebar - Controls (Scrollable)
         dbc.Col([
-            create_upload_section(),
-            create_image_filter_controls(),
+            html.Div([
+                create_upload_section(),
+                create_image_filter_controls(),
+            ], style={
+                'height': '80vh',
+                'overflowY': 'auto',
+                'paddingRight': '10px'
+            })
         ], width=4),
 
-        # Right Main Area - Preview
+        # Right Main Area - Preview (Fixed)
         dbc.Col([
-            create_preview_section(),
-            create_action_buttons(),
+            html.Div([
+                create_preview_section(),
+                create_action_buttons(),
+            ], style={
+                'height': '80vh',
+                'position': 'sticky',
+                'top': '20px'
+            })
         ], width=8),
     ]),
 ], fluid=True)
@@ -105,3 +117,23 @@ def process_image(n_clicks, brightness, contrast, threshold,
     except Exception as e:
         empty_fig = create_empty_figure()
         return empty_fig, empty_fig, f"Error: {str(e)}"
+
+
+# Single callback for all collapsible sections using pattern matching
+@callback(
+    Output({'type': 'collapse', 'index': MATCH}, 'is_open'),
+    Output({'type': 'collapse-button', 'index': MATCH}, 'children'),
+    Input({'type': 'collapse-button', 'index': MATCH}, 'n_clicks'),
+    State({'type': 'collapse', 'index': MATCH}, 'is_open'),
+    State({'type': 'collapse-button', 'index': MATCH}, 'children'),
+    prevent_initial_call=True
+)
+def toggle_collapse(n_clicks, is_open, current_children):
+    """Toggle any collapsible section."""
+    if n_clicks:
+        new_state = not is_open
+        icon = "fas fa-chevron-up" if new_state else "fas fa-chevron-down"
+        # Extract the text from current children
+        text = current_children[1] if len(current_children) > 1 else "Section"
+        return new_state, [html.I(className=f"{icon} me-2"), text]
+    return is_open, current_children
