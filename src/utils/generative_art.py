@@ -1,19 +1,22 @@
-"""
-Generative art utilities for the CNC Pen Plotter application.
-"""
-import numpy as np
+"""Generative art utilities for the CNC Pen Plotter application."""
+from __future__ import annotations
+
+import logging
+
 import cv2
+import numpy as np
 from PIL import Image
 
+logger = logging.getLogger(__name__)
 
-def generate_art(algorithm, complexity, scale):
+
+def generate_art(algorithm: str, complexity: int, scale: float) -> Image.Image:
     """Generate procedural art based on selected algorithm."""
     size = int(200 * scale)
 
     if algorithm == 'flow_field':
-        # Perlin noise flow field
         img = np.zeros((size, size))
-        for i in range(complexity * 10):
+        for _ in range(complexity * 10):
             x = np.random.randint(0, size)
             y = np.random.randint(0, size)
             length = np.random.randint(10, 50)
@@ -26,7 +29,6 @@ def generate_art(algorithm, complexity, scale):
                 angle += np.random.randn() * 0.3
 
     elif algorithm == 'spirograph':
-        # Spirograph pattern
         img = np.zeros((size, size))
         t = np.linspace(0, complexity * 2 * np.pi, 1000 * complexity)
         R, r, d = 50 * scale, 30 * scale, 40 * scale
@@ -38,7 +40,6 @@ def generate_art(algorithm, complexity, scale):
             cv2.line(img, (x[i], y[i]), (x[i + 1], y[i + 1]), 255, 1)
 
     elif algorithm == 'voronoi':
-        # Voronoi diagram
         img = np.zeros((size, size))
         points = np.random.rand(complexity * 5, 2) * size
         for y in range(size):
@@ -48,14 +49,13 @@ def generate_art(algorithm, complexity, scale):
                     img[y, x] = 255
 
     elif algorithm == 'circle_packing':
-        # Circle packing
         img = np.zeros((size, size))
-        for i in range(complexity * 20):
+        for _ in range(complexity * 20):
             x, y = np.random.randint(10, size - 10), np.random.randint(10, size - 10)
             r = np.random.randint(5, 20)
             cv2.circle(img, (x, y), r, 255, 1)
     else:
-        # Default pattern
         img = np.random.rand(size, size) * 255
 
+    logger.debug("Generated %s art with complexity=%s scale=%s", algorithm, complexity, scale)
     return Image.fromarray(img.astype(np.uint8), mode='L')

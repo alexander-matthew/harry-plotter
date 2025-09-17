@@ -1,17 +1,12 @@
-"""
-Settings page - Plot configuration for the CNC Pen Plotter application.
-"""
+"""Settings page - Plot configuration for the CNC Pen Plotter application."""
 import dash
-from dash import dcc, html, Input, Output, State, callback
+from dash import dcc, html
 import dash_bootstrap_components as dbc
-from dash.exceptions import PreventUpdate
-from datetime import datetime
 
 from src.components.controls import create_plot_settings
-from src.utils.plotting import generate_gcode, generate_svg, create_download_data
-from src.constants import DEFAULT_PLOT_SETTINGS
 
 # Register this page
+
 dash.register_page(__name__, path='/settings', title='Plot Settings')
 
 # Page layout
@@ -20,7 +15,7 @@ layout = dbc.Container([
         # Left Side - Settings
         dbc.Col([
             create_plot_settings(),
-            
+
             # Connection Settings
             dbc.Card([
                 dbc.CardHeader("Plotter Connection"),
@@ -35,7 +30,7 @@ layout = dbc.Container([
                             {'label': 'COM4', 'value': 'COM4'},
                         ],
                         value='/dev/ttyUSB0',
-                        clearable=False
+                        clearable=False,
                     ),
 
                     dbc.Label("Baud Rate", className="mt-2"),
@@ -48,14 +43,14 @@ layout = dbc.Container([
                             {'label': '115200', 'value': 115200},
                         ],
                         value=115200,
-                        clearable=False
+                        clearable=False,
                     ),
 
                     dbc.Button(
-                        "Test Connection", 
-                        id='test-connection-btn', 
-                        color="info", 
-                        className="w-100 mt-3"
+                        "Test Connection",
+                        id='test-connection-btn',
+                        color="info",
+                        className="w-100 mt-3",
                     ),
                     html.Div(id='connection-status', className="mt-2"),
                 ])
@@ -68,7 +63,7 @@ layout = dbc.Container([
                 dbc.CardHeader("Export Options"),
                 dbc.CardBody([
                     html.H6("G-Code Settings"),
-                    
+
                     dbc.Checklist(
                         id='gcode-options',
                         options=[
@@ -77,13 +72,13 @@ layout = dbc.Container([
                             {"label": "Enable Z-axis safety", "value": "z_safety"},
                         ],
                         value=["header", "homing", "z_safety"],
-                        className="mb-3"
+                        className="mb-3",
                     ),
 
                     html.Hr(),
 
                     html.H6("SVG Settings"),
-                    
+
                     dbc.Label("Stroke Width"),
                     dbc.Input(id='svg-stroke-width', type='number', value=0.5, min=0.1, max=5, step=0.1),
 
@@ -95,13 +90,15 @@ layout = dbc.Container([
                             {'label': 'inches', 'value': 'in'},
                         ],
                         value='mm',
-                        clearable=False
+                        clearable=False,
                     ),
 
                     html.Hr(),
-                    
-                    html.P("Export functionality is available on the Image Processing and Generative Art pages.", 
-                           className="text-muted text-center"),
+
+                    html.P(
+                        "Export functionality is available on the Image Processing and Generative Art pages.",
+                        className="text-muted text-center",
+                    ),
                 ])
             ]),
 
@@ -110,7 +107,7 @@ layout = dbc.Container([
                 dbc.CardHeader("Current Job Statistics"),
                 dbc.CardBody([
                     html.Div(id='job-stats', children=[
-                        html.P("No job loaded", className="text-muted")
+                        html.P("No job loaded", className="text-muted"),
                     ])
                 ])
             ], className="mt-3"),
@@ -118,23 +115,3 @@ layout = dbc.Container([
     ]),
 ], fluid=True)
 
-
-# Callbacks for settings page
-@callback(
-    Output('connection-status', 'children'),
-    Input('test-connection-btn', 'n_clicks'),
-    State('serial-port', 'value'),
-    State('baud-rate', 'value'),
-    prevent_initial_call=True
-)
-def test_connection(n_clicks, port, baud_rate):
-    """Test plotter connection."""
-    # Mock connection test
-    if n_clicks:
-        # In a real implementation, this would attempt to connect to the plotter
-        return dbc.Alert("Connection successful!", color="success")
-    return ""
-
-
-# Note: Download callbacks are handled globally in src/callbacks.py
-# to avoid duplicate output conflicts

@@ -1,6 +1,7 @@
 import dash
-from dash import dcc, html, Input, Output
+from dash import dcc, html
 import dash_bootstrap_components as dbc
+import logging
 
 # Initialize Dash app with Bootstrap theme and pages support
 app = dash.Dash(__name__, 
@@ -10,6 +11,8 @@ app = dash.Dash(__name__,
                 pages_folder="src/pages")
 
 # Define the main layout with navigation
+logging.basicConfig(level=logging.INFO)
+
 app.layout = dbc.Container([
     # Navigation bar
     dbc.Navbar(
@@ -51,7 +54,11 @@ app.layout = dbc.Container([
 ], fluid=True)
 
 # Import callbacks to register them
-import src.callbacks
+import src.callbacks  # global callbacks
+import src.pages.home_callbacks  # noqa: F401
+import src.pages.generate_callbacks  # noqa: F401
+import src.pages.settings_callbacks  # noqa: F401
 
 if __name__ == '__main__':
     app.run(debug=True, port=8050)
+
