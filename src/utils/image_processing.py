@@ -1,20 +1,28 @@
-"""
-Image processing utilities for the CNC Pen Plotter application.
-"""
-import numpy as np
+"""Image processing utilities for the CNC Pen Plotter application."""
+from __future__ import annotations
+
+import logging
+from typing import List, Tuple
+
 import cv2
+import numpy as np
 from PIL import Image
 
+logger = logging.getLogger(__name__)
 
-def apply_filters(img, brightness, contrast, threshold, invert, edge_method):
+
+def apply_filters(
+    img: Image.Image,
+    brightness: int,
+    contrast: int,
+    threshold: int,
+    invert: bool,
+    edge_method: str,
+) -> Image.Image:
     """Apply image processing filters."""
-    # Convert PIL to numpy
     img_array = np.array(img)
-
-    # Apply brightness and contrast
     img_array = cv2.convertScaleAbs(img_array, alpha=1 + contrast / 100, beta=brightness)
 
-    # Apply edge detection
     if edge_method == 'canny':
         img_array = cv2.Canny(img_array, threshold, threshold * 2)
     elif edge_method == 'sobel':
@@ -25,18 +33,17 @@ def apply_filters(img, brightness, contrast, threshold, invert, edge_method):
         img_array = cv2.Laplacian(img_array, cv2.CV_64F)
         img_array = np.absolute(img_array).astype(np.uint8)
 
-    # Apply threshold
     _, img_array = cv2.threshold(img_array, threshold, 255, cv2.THRESH_BINARY)
 
-    # Invert if needed
     if invert:
         img_array = 255 - img_array
 
     return Image.fromarray(img_array, mode='L')
 
 
-def extract_paths(img, method):
-    """Extract vector paths from image."""
-    # Mock implementation - returns dummy paths
-    # In real implementation, this would use cv2.findContours, etc.
-    return [(0, 0), (100, 100), (200, 50)] * 10
+def extract_paths(img: Image.Image, method: str) -> List[Tuple[int, int]]:
+    """Extract vector paths from image.
+
+    TODO: Implement real path extraction using cv2.findContours or similar.
+    """
+    raise NotImplementedError("Path extraction not implemented")

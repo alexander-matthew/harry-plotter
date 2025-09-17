@@ -5,24 +5,30 @@ A multipage Dash application for controlling CNC pen plotters with image process
 ## Project Structure
 
 ```
-harry-plottr/
+harry-plotter/
 ├── app.py                    # Main application entry point
 ├── requirements.txt          # Python dependencies
-├── main.py                   # Original single-file version (deprecated)
 └── src/
-    ├── __init__.py
     ├── constants.py          # Shared constants and configuration
     ├── callbacks.py          # Global callback functions
     ├── components/           # Reusable UI components
     │   ├── __init__.py
-    │   ├── controls.py       # Control widgets (sliders, dropdowns, etc.)
+    │   ├── controls/
+    │   │   ├── __init__.py
+    │   │   ├── actions.py
+    │   │   ├── generative.py
+    │   │   ├── image.py
+    │   │   └── plot_settings.py
     │   ├── preview.py        # Preview/visualization components
     │   └── upload.py         # File upload components
-    ├── pages/                # Individual pages for multipage app
+    ├── pages/                # Individual pages and callbacks
     │   ├── __init__.py
     │   ├── home.py           # Main image processing page
+    │   ├── home_callbacks.py
     │   ├── generate.py       # Generative art page
-    │   └── settings.py       # Plot configuration page
+    │   ├── generate_callbacks.py
+    │   ├── settings.py       # Plot configuration page
+    │   └── settings_callbacks.py
     └── utils/                # Utility functions
         ├── __init__.py
         ├── generative_art.py # Art generation algorithms
@@ -89,3 +95,4 @@ The application is built using:
 
 - **G-code**: CNC machine instructions for plotting
 - **SVG**: Vector graphics format for design software
+
